@@ -30,7 +30,7 @@ def serve_css():
 def serve_js():
     return send_file("static/project-script.js")
 
-# API
-@app.route("/api/get-blog-summary")
-def serve_summary():
-    ...
+# API: To be Implemeneted 
+# @app.route("/api/get-blog-summary")
+# def serve_summary():
+#     ...
