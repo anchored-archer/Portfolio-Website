@@ -3,6 +3,7 @@ import frontmatter
 import time
 import mistune 
 import psycopg2
+from psycopg2 import sql
 from dotenv import load_dotenv
 
 # Type Checking Imports 
@@ -16,9 +17,17 @@ def createdb_ifnotexists(database: str) -> Tuple[Con, Cur]:
     try:
         con = psycopg2.connect(f"dbname={database} user=postgres password={password}")
     except psycopg2.OperationalError:
+        # Create database, and close the autocmiit connection
         con: object = psycopg2.connect(f"dbname=postgres user=postgres password={password}")
+        con.set_session(autocommit=True)
         cur: object = con.cursor()
-        cur.execute("CREATE DATABASE %s;", database)
+        cur.execute(sql.SQL("CREATE database {}").format(sql.Identifier(database)))
+
+        cur.close()
+        con.close()
+
+        # Connect to the new database
+        con = psycopg2.connect(f"dbname={database} user=postgres password={password}")
     else:
         cur: object = con.cursor()
 
@@ -29,7 +38,7 @@ def check_modfied(cur, filepath) -> list | None:
     Given A filepath, and a database handeling object, check's if any modfication of fifle in the said path, is registrered to the db.
     """
     # Retrive L.M.D's from database 
-    cur.execute("SELECT last_modified_date FROM records;")
+    cur.execute(sql.SQL("SELECT last_modified_date FROM records;"))
     last_modfified_dates_db : list = [row[0] for row in cur.fetchall()]
 
     # Retrive L.M.D's from os
