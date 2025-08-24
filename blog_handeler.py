@@ -53,7 +53,6 @@ def run(self, cur, filepath):
             self.con.commit()
             time.sleep(600)
 
-
 def convert_mdh(text: str) -> str:
     """ Converts a markdown into HTML """
     markdown = mistune.create_markdown()
@@ -107,6 +106,6 @@ class Database():
 
         return data, title, last_modified_date
 
-# Create Database
+# # Create Database
 database = Database()
 cur, filepath, self = database.create_db()
