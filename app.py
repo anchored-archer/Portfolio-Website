@@ -1,5 +1,7 @@
 from flask import Flask, render_template, send_file
 import data
+import blog_handeler
+import multiprocessing
 app = Flask(__name__)
 
 # Pages
@@ -19,6 +21,7 @@ def render_contact_page():
 @app.route("/blog.html")
 def render_blog():
     blogs = data.retrive()
+    print(blogs)
     return render_template("blog.html", blogs=blogs)
 
 # JS & CSS
@@ -35,5 +38,7 @@ def serve_js():
 # def serve_summary():
 #     ...
 
-# Backend
-data.run_blog()
+if __name__ == "__main__":
+    update_proc = multiprocessing.Process(target=blog_handeler.run, daemon=True)
+    update_proc.start()
+    app.run(debug=False)

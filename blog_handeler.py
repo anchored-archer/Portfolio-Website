@@ -46,7 +46,6 @@ def check_modfied(cur, filepath) -> list | None:
 
     # Retrive L.M.D's from os
     last_modfified_dates_os : list = []
-    os.chdir(filepath)
     directories : list = os.listdir()
     for filename in directories:
         if filename != ".obsidian":  
@@ -75,14 +74,18 @@ def check_modfied(cur, filepath) -> list | None:
     else:
         return None
 
-def run(self, cur, filepath):
-    entrys = check_modfied(cur, filepath)
-    if entrys != None:
-        for filename in entrys:
-            data_value, title_value, last_modified_date_value = self.retrive_entry_data_os(f"{filename}.md")
-            self.cur.execute("UPDATE records SET data = %s, last_modified_date = %s WHERE title = %s", (data_value, last_modified_date_value, title_value))
-            self.con.commit()
-            time.sleep(600)
+def run():
+    database = Database()
+    cur, filepath, self = database.create_db()
+    
+    while True:
+        entrys = check_modfied(cur, filepath)
+        if entrys != None:
+            for filename in entrys:
+                data_value, title_value, last_modified_date_value = self.retrive_entry_data_os(f"{filename}.md")
+                self.cur.execute("UPDATE records SET data = %s, last_modified_date = %s WHERE title = %s", (data_value, last_modified_date_value, title_value))
+                self.con.commit()
+                time.sleep(600)
 
 def convert_mdh(text: str) -> str:
     """ Converts a markdown into HTML """
@@ -102,14 +105,14 @@ class Database():
 
         # Intiate Search for written blogs
         absolute_blog_folder_path = self.filepath
-        # os.chdir(absolute_blog_folder_path)
-        directories = os.listdir()
+        os.chdir(absolute_blog_folder_path)
+        files = os.listdir()
 
         # Create database useing files, their contents, metadata
-        for filename in directories:
+        for file in files:
             # Retrive Info About filename
-            if filename != ".obsidian":
-                data, title, last_modified_date = self.retrive_entry_data_os(filename)
+            if file != ".obsidian":
+                data, title, last_modified_date = self.retrive_entry_data_os(file)
                 self.title = title            
                 
                 # Fill Database
@@ -138,6 +141,6 @@ class Database():
         return data, title, last_modified_date
     
 
-# # Create Database
-database = Database()
-cur, filepath, self = database.create_db()
+# Create Database
+# database = Database()
+# cur, filepath, self = database.create_db()
