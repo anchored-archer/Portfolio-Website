@@ -5,6 +5,13 @@ import mistune
 import json
 import sqlite3
 
+def fetch(database):
+    con = sqlite3.connect("database.db")
+    cur = con.cursor()
+
+    last_modfified_dates = cur.execute("SELECT last_modified_date FROM records;")
+    #WIP
+
 def convert_mdh(text: str) -> str:
     """ Converts a markdown into HTML """
     markdown = mistune.create_markdown()
@@ -21,7 +28,7 @@ class Database():
         # Create SQLite Database
         self.con = sqlite3.connect("database.db")
         self.cur = self.con.cursor()
-        self.cur.execute("CREATE TABLE IF NOT EXISTS records (title TEXT NOT NULL, data TEXT NOT NULL, last_modified_date TEXT NOT NULL);")
+        self.cur.execute("CREATE TABLE IF NOT EXISTS records (title TEXT NOT NULL UNIQUE, data TEXT NOT NULL UNIQUE, last_modified_date TEXT NOT NULL);")
 
         # Intiate Search for written blogs
         absolute_blog_folder_path = self.filepath
@@ -41,19 +48,13 @@ class Database():
             last_modified_date = time.strftime('%B %d %Y', time.localtime(timestamp))
             
             # Fill Database
-            self.cur.execute("INSERT INTO records (title, data, last_modified_date) VALUES (?,?,?);", (title, data, last_modified_date))
+            try:
+                self.cur.execute("INSERT INTO records (title, data, last_modified_date) VALUES (?,?,?);", (title, data, last_modified_date))
+            except sqlite3.IntegrityError:
+                continue
             self.con.commit()
-
-def check_changes():
-    
-    ...
-
-def run():
-    while True:
-        time.sleep(600)
-        check_changes()
-
 
 # Create Database
 database = Database()
 database.create_db()
+
