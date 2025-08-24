@@ -1,0 +1,5 @@
+psycopg2
+python-frontmatter
+mistune
+python-dotenv
+Flask

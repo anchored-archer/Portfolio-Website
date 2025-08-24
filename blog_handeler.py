@@ -1,12 +1,32 @@
 import os
-import frontmatter
+import frontmatter 
 import time
-import mistune
-import sqlite3
+import mistune 
+import psycopg2
+from dotenv import load_dotenv
+
+# Type Checking Imports 
+from typing import Tuple
+from psycopg2.extensions import connection as Con, cursor as Cur
+
+load_dotenv()
+
+def createdb_ifnotexists(database: str) -> Tuple[Con, Cur]:
+    password: str = os.environ["POSTGRES_PASSWORD"]
+    try:
+        con = psycopg2.connect(f"dbname={database} user=postgres password={password}")
+    except psycopg2.OperationalError:
+        con: object = psycopg2.connect(f"dbname=postgres user=postgres password={password}")
+        cur: object = con.cursor()
+        cur.execute("CREATE DATABASE %s;", database)
+    else:
+        cur: object = con.cursor()
+
+    return con, cur
 
 def check_modfied(cur, filepath) -> list | None:
     """
-    Given A filepath, and a database handeling object, check's if any modfication of file in the said path, is registrered to the db.
+    Given A filepath, and a database handeling object, check's if any modfication of fifle in the said path, is registrered to the db.
     """
     # Retrive L.M.D's from database 
     cur.execute("SELECT last_modified_date FROM records;")
@@ -57,17 +77,16 @@ def convert_mdh(text: str) -> str:
     """ Converts a markdown into HTML """
     markdown = mistune.create_markdown()
     html = markdown(text)
-    return html
+    return str(html) 
 
 class Database():
     def __init__(self, filepath = "C:/Users/ghosa/Desktop/Master Folder/Programing/portfolio-web/blog") -> None:
         self.cur = None
+        self.con = None
         self.filepath = filepath
     
     def create_db(self):
-        # Create SQLite Database
-        self.con = sqlite3.connect("database.db")
-        self.cur = self.con.cursor()
+        self.con, self.cur = createdb_ifnotexists("portfolio-database.db")
         self.cur.execute("CREATE TABLE IF NOT EXISTS records (title TEXT NOT NULL UNIQUE, data TEXT NOT NULL UNIQUE, last_modified_date TEXT NOT NULL);")
 
         # Intiate Search for written blogs
@@ -85,7 +104,7 @@ class Database():
                 # Fill Database
                 try:
                     self.cur.execute("INSERT INTO records (title, data, last_modified_date) VALUES (?,?,?);", (title, data, last_modified_date))
-                except sqlite3.IntegrityError:
+                except psycopg2.IntegrityError:
                     continue
                 self.con.commit()
             else:
@@ -93,9 +112,9 @@ class Database():
         
         return self.cur, absolute_blog_folder_path, self
     
-    def retrive_entry_data_os(self : object, filename : str) -> str:
+    def retrive_entry_data_os(self : object, filename : str) -> tuple[str, str, str]:
         """Retrives data about a specific blog file from the os"""
-        filepath: str = f"{self.filepath}/{filename}"
+        filepath: str = f"{self.filepath}/{filename}" #type: ignore
         markdown_file_object: object = frontmatter.load(filepath)
         text: str = markdown_file_object.content
         timestamp = os.path.getmtime(filename)
