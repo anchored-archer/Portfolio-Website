@@ -1,0 +1,82 @@
+/* Universal Customizations: */
+body {
+    background-color: #08051a;
+}
+
+.navbar {
+    background-color: #e3f2fd;
+}
+
+.info-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+.btn-primary {
+    transition: transform 1s;
+    background-color: #08051a;
+}
+
+
+.btn-primary:hover, .btn-primary:focus-visible {
+    transform: translateY(25%);
+    transition: transform 0.5s;
+    background-color: #08051a;
+}
+
+/* Home: Presentation Text Customization: */
+div.info-card h1, h4, a {
+    align-self: flex-start;
+}
+
+div.info-card p {
+    color: #d07160;
+    font-size: 120%;
+}
+
+div.info-card h1 {
+    font-family: Impact, 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
+    color: #D07160;
+}
+
+div.info-card h4 {
+    font-family: 'Courier New', Courier, monospace;
+    color: #dc960a;
+}
+
+/* Projects => Cards: */
+.card {
+    background-color: #0b0636;}
+
+.card-text {
+    color: #ff8984;
+    font-family: sans-serif;
+    text-align: left;   
+}
+
+.card-title {
+    color: #f7af5c;
+    font-family: cursive;
+}
+
+.card-subtitle {
+    color: #f9f871;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.card-body * {
+    margin-bottom: 5%;
+}
+
+/* Button Customization: Home */
+
+.project-redirect-btn:hover, .project-redirect-btn:focus-visible {
+    background-color: #057ee9;
+}
+
+.project-redirect-btn {
+    background-color: #08051a;
+}

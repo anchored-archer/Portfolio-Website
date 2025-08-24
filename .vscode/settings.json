@@ -1,0 +1,10 @@
+{
+    "python.autoComplete.extraPaths": [
+        "C:/Python312/Lib/site-packages/flask",
+        "C:/Python312/Lib/site-packages/flask-3.0.0.dist-info"
+    ],
+    "python.analysis.extraPaths": [
+        "C:/Python312/Lib/site-packages/flask",
+        "C:/Python312/Lib/site-packages/flask-3.0.0.dist-info"
+    ]
+}
