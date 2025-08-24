@@ -19,7 +19,7 @@ def render_contact_page():
 @app.route("/blog.html")
 def render_blog():
     blogs = data.retrive()
-    return render_template("blog.html", blogs)
+    return render_template("blog.html", blogs=blogs)
 
 # JS & CSS
 @app.route("/styles.css")
@@ -34,3 +34,6 @@ def serve_js():
 # @app.route("/api/get-blog-summary")
 # def serve_summary():
 #     ...
+
+# Backend
+data.run_blog()
