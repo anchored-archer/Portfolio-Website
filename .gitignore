@@ -1,5 +1,5 @@
 /.vscode
-/__pycache
+/__pycache__
 .gitattributes
 database.db
 sqlite3.exe
