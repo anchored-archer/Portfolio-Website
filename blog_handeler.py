@@ -10,18 +10,20 @@ from dotenv import load_dotenv
 from typing import Tuple
 from psycopg2.extensions import connection as Con, cursor as Cur
 
+dotenv_path = "/home/wanderer/Desktop/Portfolio-Website/docker/.env"
 load_dotenv()
+print(os.environ["POSTGRES_PASSWORD"])
 
 def createdb_ifnotexists(database: str) -> Tuple[Con, Cur]:
     """
     Given a database name, connects to it. If it doesn't exist, connects to the master database and creates it. 
     """
-    password: str = os.environ["POSTGRES_PASSWORD"]
+    password: str = os.environ["POSTGRES_PASSWORD"] 
     try:
-        con = psycopg2.connect(f"dbname={database} user=postgres password={password}")
+        con = psycopg2.connect(f"dbname={database} user=postgres password={password} host=db port=5432")
     except psycopg2.OperationalError:
         # Create database, and close the autocmiit connection
-        con: object = psycopg2.connect(f"dbname=postgres user=postgres password={password}")
+        con: object = psycopg2.connect(f"dbname=postgres user=postgres password={password} host=db port=5432")
         con.set_session(autocommit=True)
         cur: object = con.cursor()
         cur.execute(sql.SQL("CREATE database {}").format(sql.Identifier(database)))
@@ -100,7 +102,7 @@ class Database():
         self.filepath = filepath
     
     def create_db(self):
-        self.con, self.cur = createdb_ifnotexists("portfolio-database.db")
+        self.con, self.cur = createdb_ifnotexists("portfolio-database")
         self.cur.execute(sql.SQL("CREATE TABLE IF NOT EXISTS records (title TEXT NOT NULL UNIQUE, data TEXT NOT NULL UNIQUE, last_modified_date TEXT NOT NULL);"))
 
         # Intiate Search for written blogs
@@ -141,6 +143,6 @@ class Database():
         return data, title, last_modified_date
     
 
-# Create Database
+# # Create Database
 # database = Database()
 # cur, filepath, self = database.create_db()

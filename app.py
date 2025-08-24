@@ -41,4 +41,4 @@ def serve_js():
 if __name__ == "__main__":
     update_proc = multiprocessing.Process(target=blog_handeler.run, daemon=True)
     update_proc.start()
-    app.run(debug=False)
+    app.run(host="0.0.0.0", port=5000, debug=False)
