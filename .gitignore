@@ -1,0 +1,5 @@
+/.vscode
+/__pycache
+.gitattributes
+database.db
+sqlite3.exe
