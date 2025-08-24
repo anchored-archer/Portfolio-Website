@@ -17,9 +17,10 @@ def check_modfied(cur, filepath) -> list | None:
     os.chdir(filepath)
     directories : list = os.listdir()
     for filename in directories:
-        timestamp = os.path.getmtime(filename)
-        last_modified_date: str = time.strftime('%B %d %Y', time.localtime(timestamp))
-        last_modfified_dates_os.append(last_modified_date)
+        if filename != ".obsidian":  
+            timestamp = os.path.getmtime(filename)
+            last_modified_date: str = time.strftime('%B %d %Y %I:%M:%S %p', time.localtime(timestamp))
+            last_modfified_dates_os.append(last_modified_date)
     changed_LMDs : list = []
     
     # Check if the os's LMD databases's LMD match
@@ -30,16 +31,28 @@ def check_modfied(cur, filepath) -> list | None:
     # pulls up, and returns a list of filenames, whose lmd's where modfified; If no mod, returns None
     if len(changed_LMDs) != 0:
         filenames : list = []
-        for filename, changed_date in zip(directories, changed_LMDs): 
-            timestamp = os.path.getmtime(filename)
-            last_modified_date : str = time.strftime('%B %d %Y', time.localtime(timestamp))
+        #TODO: REWRITTEN
+        for filename in directories: 
+            if filename != ".obsidian":  
+                timestamp = os.path.getmtime(filename)
+                last_modified_date : str = time.strftime('%B %d %Y %I:%M:%S %p', time.localtime(timestamp))
 
-            if last_modified_date == changed_date:
-                filenames.append(filename.rstrip('.md'))
-        
+                for changed_date in changed_LMDs:
+                    if last_modified_date == changed_date:
+                        filenames.append(filename.rstrip('.md'))
         return filenames 
     else:
         return None
+
+def run(self, cur, filepath):
+    entrys = check_modfied(cur, filepath)
+    if entrys != None:
+        for filename in entrys:
+            data, title, last_modified_date = self.retrive_entry_data_os(f"{filename}.md")
+            self.cur.execute("UPDATE records SET data = ?, last_modified_date = ? WHERE title = ?;", (data, last_modified_date, title))
+            self.con.commit()
+            time.sleep(600)
+
 
 def convert_mdh(text: str) -> str:
     """ Converts a markdown into HTML """
@@ -65,26 +78,35 @@ class Database():
 
         # Create database useing files, their contents, metadata
         for filename in directories:
-            filepath = f"{self.filepath}/{filename}"
-            markdown_file_object = frontmatter.load(filepath)
-            text = markdown_file_object.content
-            timestamp = os.path.getmtime(filename)
-
-            data = convert_mdh(text)
-            title = filename.rstrip('.md')
-            self.title = title
-            last_modified_date = time.strftime('%B %d %Y', time.localtime(timestamp))
-            
-            # Fill Database
-            try:
-                self.cur.execute("INSERT INTO records (title, data, last_modified_date) VALUES (?,?,?);", (title, data, last_modified_date))
-            except sqlite3.IntegrityError:
+            # Retrive Info About filename
+            if filename != ".obsidian":
+                data, title, last_modified_date = self.retrive_entry_data_os(filename)
+                self.title = title            
+                
+                # Fill Database
+                try:
+                    self.cur.execute("INSERT INTO records (title, data, last_modified_date) VALUES (?,?,?);", (title, data, last_modified_date))
+                except sqlite3.IntegrityError:
+                    continue
+                self.con.commit()
+            else:
                 continue
-            self.con.commit()
         
-        return self.cur, absolute_blog_folder_path
+        return self.cur, absolute_blog_folder_path, self
+    
+    def retrive_entry_data_os(self : object, filename : str) -> str:
+        """Retrives data about a specific blog file from the os"""
+        filepath: str = f"{self.filepath}/{filename}"
+        markdown_file_object: object = frontmatter.load(filepath)
+        text: str = markdown_file_object.content
+        timestamp = os.path.getmtime(filename)
+
+        data: str = convert_mdh(text)
+        title: str = filename.rstrip('.md')
+        last_modified_date: str = time.strftime('%B %d %Y %I:%M:%S %p', time.localtime(timestamp))
+
+        return data, title, last_modified_date
 
 # Create Database
 database = Database()
-cur, filepath = database.create_db()
-
+cur, filepath, self = database.create_db()
