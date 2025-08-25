@@ -32,7 +32,7 @@ def createdb_ifnotexists(database: str) -> Tuple[Con, Cur]:
         con.close()
 
         # Connect to the new database
-        con = psycopg2.connect(f"dbname={database} user=postgres password={password}")
+        con = psycopg2.connect(f"dbname={database} user=postgres password={password} host=db port=5432")
     else:
         cur: object = con.cursor()
 
@@ -143,6 +143,6 @@ class Database():
         return data, title, last_modified_date
     
 
-# # Create Database
+# # # Create Database
 # database = Database()
 # cur, filepath, self = database.create_db()
