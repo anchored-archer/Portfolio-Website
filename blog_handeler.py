@@ -33,9 +33,8 @@ def createdb_ifnotexists(database: str) -> Tuple[Con, Cur]:
 
         # Connect to the new database
         con = psycopg2.connect(f"dbname={database} user=postgres password={password} host=db port=5432")
-    else:
-        cur: object = con.cursor()
 
+    cur: object = con.cursor()
     return con, cur
 
 def check_modfied(cur, filepath) -> list | None:
@@ -78,16 +77,16 @@ def check_modfied(cur, filepath) -> list | None:
 
 def run():
     database = Database()
-    cur, filepath, self = database.create_db()
+    filepath = database.create_db()
     
     while True:
-        entrys = check_modfied(cur, filepath)
-        if entrys != None:
-            for filename in entrys:
-                data_value, title_value, last_modified_date_value = self.retrive_entry_data_os(f"{filename}.md")
-                self.cur.execute("UPDATE records SET data = %s, last_modified_date = %s WHERE title = %s", (data_value, last_modified_date_value, title_value))
-                self.con.commit()
-                time.sleep(600)
+        entries = check_modfied(database.cur, filepath)
+        if entries:
+            for filename in entries:
+                data_value, title_value, last_modified_date_value = database.retrive_entry_data_os(f"{filename}.md")
+                database.cur.execute("UPDATE records SET data = %s, last_modified_date = %s WHERE title = %s", (data_value, last_modified_date_value, title_value))
+                database.con.commit()
+        time.sleep(600)
 
 def convert_mdh(text: str) -> str:
     """ Converts a markdown into HTML """
@@ -128,7 +127,7 @@ class Database():
             else:
                 continue
         
-        return self.cur, absolute_blog_folder_path, self
+        return absolute_blog_folder_path
     
     def retrive_entry_data_os(self : object, filename : str) -> tuple[str, str, str]:
         """Retrives data about a specific blog file from the os"""
