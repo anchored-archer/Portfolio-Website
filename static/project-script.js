@@ -58,7 +58,7 @@ function make_elements(repo_info) {
 }
 
 async function load_web() {
-  let user_repos = get_user_repositories("Wandering-Explorer");
+  let user_repos = get_user_repositories("anchored-archer");
   user_repos
     .then((responce) => {
       let cleaned_repo_array = make_repo_array(responce.data);

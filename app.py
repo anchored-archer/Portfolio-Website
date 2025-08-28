@@ -21,7 +21,6 @@ def render_contact_page():
 @app.route("/blog.html")
 def render_blog():
     blogs = data.retrive()
-    print(blogs)
     return render_template("blog.html", blogs=blogs)
 
 # JS & CSS
@@ -41,4 +40,4 @@ def serve_js():
 if __name__ == "__main__":
     update_proc = multiprocessing.Process(target=blog_handeler.run, daemon=True)
     update_proc.start()
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=5000, debug=True)

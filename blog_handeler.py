@@ -142,6 +142,3 @@ class Database():
         return data, title, last_modified_date
     
 
-# # # Create Database
-# database = Database()
-# cur, filepath, self = database.create_db()

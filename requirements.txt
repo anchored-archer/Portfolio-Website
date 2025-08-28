@@ -3,3 +3,5 @@ python-frontmatter;
 mistune;
 python-dotenv;
 Flask;
+lxml;
+beautifulsoup4;
