@@ -1,8 +1,14 @@
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template, send_file, send_from_directory
 import data
-import blog_handeler
-import multiprocessing
+
+
 app = Flask(__name__)
+
+# # Start the debugger
+# if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+#     debugpy.listen(("0.0.0.0", 5678))
+#     print("Debugger is listening on port 5678. Waiting for client to attach...")
+#     debugpy.wait_for_client()
 
 # Pages
 @app.route("/")
@@ -10,13 +16,9 @@ app = Flask(__name__)
 def render_homepage():
     return render_template('index.html')
 
-@app.route("/projects.html")
+@app.route("/work.html")
 def render_projects():
-    return render_template('projects.html')
-
-@app.route("/contact.html")
-def render_contact_page():
-    return render_template("contact.html")
+    return render_template('work.html')
 
 @app.route("/blog.html")
 def render_blog():
@@ -24,20 +26,28 @@ def render_blog():
     return render_template("blog.html", blogs=blogs)
 
 # JS & CSS
-@app.route("/styles.css")
+@app.route("/style.css")
 def serve_css():
-    return send_file("static/styles.css")
+    return send_file("static/style.css")
 
-@app.route("/project-script.js")
+@app.route("/script.js")
 def serve_js():
-    return send_file("static/project-script.js")
+    return send_file("static/script.js")
 
-# API: To be Implemeneted 
-# @app.route("/api/get-blog-summary")
-# def serve_summary():
-#     ...
+@app.route("/images/<path:filename>")
+def serve_image_from_folder(filename):
+    return send_from_directory("static/images", filename)
 
-if __name__ == "__main__":
-    update_proc = multiprocessing.Process(target=blog_handeler.run, daemon=True)
-    update_proc.start()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+@app.route('/blog/<title>')
+def blog_post(title):
+    blog_title = title.replace("-", " ")
+    blog = data.retrieve_single_blog(blog_title)
+    if blog:
+        return render_template('blog-view.html', blog=blog)
+    else:
+        return "Post not found", 404
+
+def create_app():
+    app = Flask(__name__)
+    # routes here
+    return app

@@ -5,3 +5,5 @@ python-dotenv;
 Flask;
 lxml;
 beautifulsoup4;
+debugpy;
+gunicorn;

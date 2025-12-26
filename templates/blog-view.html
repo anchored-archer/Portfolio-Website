@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <title>Portfolio</title>
+</head>
+<body class="blog-page">
+    {% set title = blog[0] %}
+    {% set last_updated_time = blog[2] %}
+    <main class="page-wrapper">
+        <article class="blog-content">
+            <h1>{{ title }}</h1>
+            <h3>By Ramanuj On {{ last_updated_time }}</h3>
+            {{ blog[1]|safe }}
+        </article>
+    </main>
+</body>
+</html>
