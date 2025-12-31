@@ -1,4 +1,4 @@
-name: portfolio-website
+name: ramanuj-portfolio-website
 services:
   nginx:
     image: nginx:alpine
