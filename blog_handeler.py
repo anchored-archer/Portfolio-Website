@@ -5,6 +5,7 @@ import mistune
 import psycopg2
 from psycopg2 import sql
 from dotenv import load_dotenv
+import subprocess
 
 # Type Checking Imports 
 from typing import Tuple
@@ -60,10 +61,44 @@ def createdb_ifnotexists(database: str):
             print(f"Waiting for database '{database}'...")
             time.sleep(2)
 
+def get_git_commit_date(filepath: str) -> str | int:
+    """
+    Gets the last commit date for a file using Git.
+    Returns the date as a formatted string.
+    """
+    try:
+        # The command is broken into a list for security and correctness
+        command = [
+            "git", "log", "-1",
+            "--pretty=format:%cd",
+            "--date=format:%B %d %Y %I:%M:%S %p",
+            "--",
+            filepath
+        ]
+        
+        # Execute the command
+        result = subprocess.run(
+            command,
+            capture_output=True,  # Capture the command's output
+            text=True,            # Decode the output as text
+            check=True,           # Raise an exception if the command fails
+            encoding='utf-8'      # Specify encoding
+        )
+        
+        # The output is in result.stdout, strip any trailing newline
+        return result.stdout.strip()
+    except: 
+        raise 
+
+
 def check_modfied(cur, filepath) -> list[str] | None:
     # Fetch DB state
     cur.execute("SELECT title, last_modified_date FROM records;")
-    db_state = {row[0]: row[1] for row in cur.fetchall()}
+
+    # Get a dictionary up where title of blogs is key, and last_modified_date is the va
+    db_state = {}
+    for row in cur.fetchall:
+        db_state[row[0]] = row[1]
 
     changed_files = []
 
@@ -74,10 +109,10 @@ def check_modfied(cur, filepath) -> list[str] | None:
         full_path = os.path.join(filepath, filename)
         title = filename[:-3]
 
-        timestamp = os.path.getmtime(full_path)
-        last_modified_date = time.strftime(
-            "%B %d %Y %I:%M:%S %p", time.localtime(timestamp)
-        )
+        try:
+            last_modified_date = get_git_commit_date(full_path)
+        except:
+            raise
 
         if title not in db_state or db_state[title] != last_modified_date:
             changed_files.append(full_path)
