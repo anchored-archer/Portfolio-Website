@@ -51,7 +51,6 @@ def retrive():
             alt_text = match.group(2)   
             preview_text_list.append([entry[0], entry_text, alt_text, image_src, formatted_date, entry_link])
     
-    preview_text_list.reverse()
     return preview_text_list
 
 def retrieve_single_blog(title: str):
