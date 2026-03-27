@@ -51,7 +51,7 @@ def retrive():
             alt_text = match.group(2)   
             preview_text_list.append([entry[0], entry_text, alt_text, image_src, formatted_date, entry_link])
     
-    return preview_text_list
+    return preview_text_list.reverse()
 
 def retrieve_single_blog(title: str):
     database = "portfolio-database"
