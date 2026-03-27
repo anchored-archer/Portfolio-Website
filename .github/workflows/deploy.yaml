@@ -10,9 +10,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
+        ref: 'main'
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
@@ -36,5 +37,6 @@ jobs:
         key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
         script: |
           cd ~/Portfolio-Website
+          git fetch --unshallow || true
           docker compose pull
           docker compose up -d
