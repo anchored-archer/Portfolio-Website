@@ -97,7 +97,7 @@ def check_modfied(cur, filepath) -> list[str] | None:
 
     # Get a dictionary up where title of blogs is key, and last_modified_date is the va
     db_state = {}
-    for row in cur.fetchall:
+    for row in cur.fetchall():
         db_state[row[0]] = row[1]
 
     changed_files = []
@@ -199,12 +199,8 @@ class Database():
         markdown_file_object = frontmatter.load(filepath)
         text = markdown_file_object.content
 
-        timestamp = os.path.getmtime(filepath)
-
         title = os.path.splitext(os.path.basename(filepath))[0]
-        last_modified_date = time.strftime(
-            "%B %d %Y %I:%M:%S %p", time.localtime(timestamp)
-        )
+        last_modified_date = get_git_commit_date(filepath)
 
         data = convert_mdh(text)
         return data, title, last_modified_date
