@@ -12,6 +12,8 @@ services:
       POSTGRES_HOST: db
     depends_on:
       - db
+    volumes:
+      - ../blog:/app/blog
     restart: unless-stopped
 
   worker:
